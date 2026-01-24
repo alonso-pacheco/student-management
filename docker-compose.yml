@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # Servicio de Django
+  django-app:
+    build:
+      context: ./student-crud-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./student-crud-frontend:/app
+    env_file:
+      - ./student-crud-frontend/.env
+    networks:
+      - app-network
+    # command: >
+    #   sh -c "python manage.py migrate &&
+    #          python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - mysql
+    stdin_open: true
+    tty: true
+
+  # Servicio de Flask
+  flask-app:
+    build:
+      context: ./student-crud-backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./student-crud-backend:/app
+    env_file:
+      - ./student-crud-backend/.env
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+    command: >
+      sh -c "sleep 10 &&
+             python -c 'from app import create_engine_with_retry; create_engine_with_retry()' &&
+             flask run --host=0.0.0.0 --port=5000"
+
+  # Base de datos MySQL
+  mysql:
+    image: mysql:8.0
+    command: --bind-address=0.0.0.0 --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: 1a2b3c4d
+      MYSQL_DATABASE: students_crud
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+
+volumes:
+  mysql_data:
+  
+
+networks:
+  app-network:
+    driver: bridge
