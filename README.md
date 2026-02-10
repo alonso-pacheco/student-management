@@ -1,6 +1,14 @@
 # Student CRUD
 In this repository is the backend and frontend of project
-## Run project
+
+## Run project with Docker
+1. Activate Docker
+2. In Backend project, copy `.env.example` file and change name to `.env` and update MySQL connection string
+3. In Frontend project, copy `.env.example` file and change name to `.env` and update endpoint
+
+2. Run `docker compose up`
+
+## Run project by folder
 1. Access to folder project
 2. Activate virtual environment
     * Windows: venv\Scripts\activate
@@ -22,8 +30,7 @@ flask run
 python manage.py runserver
 ```
 
-# Docker
-1. docker compose up
+
 
 
 ### Changes
